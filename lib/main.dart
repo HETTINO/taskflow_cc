@@ -27,7 +27,7 @@ class WelcomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     const studentName = 'Cristina';
-    const pendingTasks = 5;
+    const pendingTasks = 8;
     const courseName = 'Desarrollo de aplicaciones móviles';
     const motivationalMessage = 'Cada día aprendo algo nuevo';
 
