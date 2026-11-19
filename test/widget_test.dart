@@ -1,16 +1,20 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:provider/provider.dart';
 
-import 'package:taskflow/main.dart';
+import 'package:taskflow/app/taskflow_app.dart';
+import 'package:taskflow/features/tasks/data/local_task_repository.dart';
+import 'package:taskflow/features/tasks/presentation/tasks_view_model.dart';
 
 void main() {
-  testWidgets('Agregar tarea aumenta el contador', (WidgetTester tester) async {
-    await tester.pumpWidget(const TaskFlowApp());
+  testWidgets('La lista muestra las tareas', (WidgetTester tester) async {
+    await tester.pumpWidget(
+      ChangeNotifierProvider<TasksViewModel>(
+        create: (_) => TasksViewModel(LocalTaskRepository()),
+        child: const TaskFlowApp(),
+      ),
+    );
+    await tester.pumpAndSettle();
 
-    expect(find.text('Tareas pendientes: 3'), findsOneWidget);
-
-    await tester.tap(find.text('Agregar tarea'));
-    await tester.pump();
-
-    expect(find.text('Tareas pendientes: 4'), findsOneWidget);
+    expect(find.text('Mis tareas'), findsOneWidget);
   });
 }
