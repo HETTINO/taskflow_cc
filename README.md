@@ -78,3 +78,38 @@ samples, guidance on mobile development, and a full API reference.
 | DELETE | /tasks/:id | Eliminar tarea |
 
 La API concreta se elegirá después. Estas rutas son requisitos, no direcciones de un servidor ya conectado.
+
+
+## API de tareas
+
+TaskFlow obtiene sus tareas de JSONPlaceholder, una API pública de prueba, usando el cliente HTTP Dio.
+
+- **URL exacta:** `https://jsonplaceholder.typicode.com/todos?userId=2`
+- **Método:** `GET`
+- **Parámetro `userId`:** filtra las tareas de un solo usuario. En el código se define en la constante `TaskApiService.userId`, y el valor elegido es `2`.
+
+### Campos que llegan de la API
+
+| Campo de la API | Campo en `Task` | Nota |
+|---|---|---|
+| `id` | `id` | Se usa como número entero. |
+| `title` | `title` | Texto de la tarea. |
+| `completed` | `isCompleted` | `fromJson` acepta `completed` o `isCompleted`. |
+| `userId` | `userId` | Corresponde al usuario consultado. |
+
+### Valores que TaskFlow completa por defecto
+
+La API no entrega `description` ni `priority`, por lo que `Task.fromJson` usa estos valores de ejemplo cuando faltan:
+
+- `description`: `Sin descripción (API)`
+- `priority`: `Sin prioridad (API)`
+
+Estos valores no vienen del servidor.
+
+### Marcar una tarea sigue siendo local
+
+Al marcar una tarea como completada, el cambio solo se guarda en una copia en memoria (`RemoteTaskRepository.save`). JSONPlaceholder no guarda cambios permanentes, así que al reiniciar la app la tarea vuelve a su estado original. Las operaciones remotas de escritura se estudiarán en sesiones posteriores.
+
+### Recorrido de los datos
+
+`main.dart` → `TasksViewModel.loadTasks()` → `RemoteTaskRepository.getTasks()` → `TaskApiService.getTasks()` → Dio hace `GET` → `Task.fromJson()` → `notifyListeners()` → la pantalla muestra la lista.
