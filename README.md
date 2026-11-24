@@ -113,3 +113,27 @@ Al marcar una tarea como completada, el cambio solo se guarda en una copia en me
 ### Recorrido de los datos
 
 `main.dart` → `TasksViewModel.loadTasks()` → `RemoteTaskRepository.getTasks()` → `TaskApiService.getTasks()` → Dio hace `GET` → `Task.fromJson()` → `notifyListeners()` → la pantalla muestra la lista.
+
+## Estados de la lista de tareas
+
+La pantalla "Mis tareas" distingue cuatro situaciones. `TasksViewModel` guarda el estado (`isLoading`, `errorMessage` y la lista de tareas) y `TaskListScreen` dibuja la pantalla correspondiente con `context.watch`.
+
+| Estado | Qué se muestra | Acción disponible |
+|---|---|---|
+| Carga | Indicador circular de progreso | El icono de actualizar se desactiva para evitar consultas repetidas |
+| Éxito | Una tarjeta por cada tarea | Tocar una tarea abre su detalle; también se puede actualizar con el icono o deslizando hacia abajo |
+| Vacío | "No tienes tareas pendientes por ahora." | Botón **Volver a consultar** |
+| Error | "No pudimos cargar tus tareas. Revisa tu conexión a internet." | Botón **Reintentar** |
+
+**Diferencia entre vacío y error:** vacío es una respuesta válida (el servidor respondió `HTTP 200` con una lista sin tareas). Error significa que la consulta falló y no se sabe qué tareas hay.
+
+### Cómo provocar cada estado
+
+- **Carga:** iniciar la app o pulsar el icono de actualizar; el indicador aparece mientras llega la respuesta.
+- **Éxito:** abrir la app con internet y con `userId = 2` en `TaskApiService`.
+- **Vacío:** cambiar temporalmente `userId` a `9999` en `TaskApiService` y reiniciar la app. La API responde `HTTP 200` con una lista vacía. Después se restaura el valor `2`.
+- **Error:** desactivar el Wi-Fi y los datos del celular y pulsar el icono de actualizar. Al reactivar internet y pulsar **Reintentar**, la lista se recupera sin reiniciar la app.
+
+### Nota
+
+Actualizar vuelve a leer el servidor, por lo que una tarea marcada como completada de forma local puede volver a su estado original. Los cambios permanentes se estudiarán en las sesiones de CRUD.
