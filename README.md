@@ -137,3 +137,26 @@ La pantalla "Mis tareas" distingue cuatro situaciones. `TasksViewModel` guarda e
 ### Nota
 
 Actualizar vuelve a leer el servidor, por lo que una tarea marcada como completada de forma local puede volver a su estado original. Los cambios permanentes se estudiarán en las sesiones de CRUD.
+
+## Formulario de tareas
+
+La pantalla "Nueva tarea" (`/new`) valida los datos antes de preparar una tarea. Se abre con el botón flotante **Nueva tarea** de la lista.
+
+| Campo | Regla | Mensaje de validación |
+|---|---|---|
+| Título | Obligatorio, entre 3 y 60 caracteres | "Escribe un título para tu tarea." / "El título debe tener al menos 3 caracteres." / "El título no puede pasar de 60 caracteres." |
+| Descripción | Opcional | No tiene validación |
+| Prioridad | Alta, Media o Baja (por defecto Media) | No necesita validación |
+| Fecha límite | Opcional, con selector de calendario (`showDatePicker`) | No se exige para guardar; se puede quitar con ✕ |
+
+**Cómo funciona:** `Form` agrupa los campos y `GlobalKey<FormState>` permite llamar a `validate()` al pulsar **Guardar**. Si todo es válido, `context.pop(draft)` devuelve un `TaskDraft` (título, descripción, prioridad y fecha opcional) a la lista, que muestra un mensaje de confirmación.
+
+**Importante:** Guardar todavía no crea la tarea en la API. Solo valida y devuelve el borrador; en la sesión 10 se conectará con `POST`.
+
+### Cómo probarlo
+
+- **Título vacío:** pulsar Guardar sin escribir. Aparece el mensaje de título obligatorio.
+- **Título de dos caracteres:** escribir `ab`. Aparece el mensaje de longitud mínima.
+- **Formulario válido:** escribir un título de 3 o más caracteres. El formulario se cierra y la lista muestra "Formulario válido: ...".
+- **Con fecha:** elegir un día en el calendario. El mensaje agrega "(para el dd/mm/aaaa)".
+- **Cancelar:** volver con la flecha ←. No aparece ningún mensaje.
